@@ -105,6 +105,23 @@ function obtenerCaseSuplente(PDO $pdo) {
 }
 
 function obtenerDatosDocente(PDO $pdo, $dni, $ciclo) {
+    // Buscar nombre del ciclo en la tabla periodos
+    $nombre_ciclo_real = $ciclo; // Fallback
+    try {
+        $stmtPeriodo = $pdo->query("SELECT inicio_ciclo, fin_ciclo FROM periodos LIMIT 1");
+        if ($rowPeriodo = $stmtPeriodo->fetch()) {
+            $inicio = trim($rowPeriodo['inicio_ciclo']);
+            $fin = trim($rowPeriodo['fin_ciclo']);
+            if (!empty($inicio) && !empty($fin)) {
+                $nombre_ciclo_real = $inicio . ' - ' . $fin;
+            } elseif (!empty($inicio)) {
+                $nombre_ciclo_real = $inicio;
+            }
+        }
+    } catch (Exception $e) {
+        // Ignorar si no existe la tabla o campos y usar el fallback
+    }
+
     $caseSuplente = obtenerCaseSuplente($pdo);
 
     $sql = "
@@ -159,7 +176,7 @@ function obtenerDatosDocente(PDO $pdo, $dni, $ciclo) {
         return [
             'nombre' => strtoupper($nombreCompleto),
             'dni' => $row['dni'],
-            'ciclo' => $ciclo,
+            'ciclo' => strtoupper($nombre_ciclo_real),
             'sedes' => $row['sedes'],
             'cursos' => $row['cursos'],
             'areas' => $row['areas'],
