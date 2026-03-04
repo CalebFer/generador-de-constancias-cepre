@@ -2,6 +2,32 @@
 // conexion.php
 
 /**
+ * Devuelve el arreglo con todas las bases de datos configuradas para cada ciclo.
+ * 
+ * @return array Arreglo asociativo de Ciclo => NombreBD
+ */
+function obtenerBasesDeDatos() {
+    return [
+        'CEPRE_2022_1' => 'cepre',
+        'CEPRE_2022_2'  => 'cepre_2022_2023',
+        'CEPRE_2023_1' => 'cepre_2023_1',
+        'CEPRE_2023_2' => 'cepre_2023_2',
+        'CEPRE_2024_1' => 'cepre_2024_1',
+        'CEPRE_2024_2' => 'cepre_2024_2',
+        'CEPRE_2025_1' => 'marzo_julio_2025',
+    ];
+}
+
+/**
+ * Devuelve los nombres de los ciclos (claves) que están configurados.
+ *
+ * @return array
+ */
+function obtenerCiclosDisponibles() {
+    return array_keys(obtenerBasesDeDatos());
+}
+
+/**
  * Función para obtener la conexión a la base de datos dependiendo del ciclo
  * 
  * @param string $ciclo El nombre del ciclo académico
@@ -14,20 +40,8 @@ function obtenerConexion($ciclo) {
     $usuario = 'admincepre'; // Cambiar por tu usuario real
     $password = 'cepre2026';    // Cambiar por tu contraseña real
     
-    // Mapeo de ciclos a sus respectivas bases de datos
-    // Aquí puedes agregar o modificar los nombres de las bases de datos
-    $bases_de_datos = [
-        'CEPRE_2022_1' => 'cepre',
-        'CEPRE_2022_2'  => 'cepre_2022_2023',
-        'CEPRE_2023_1' => 'cepre_2023_1',
-        'CEPRE_2023_2' => 'cepre_2023_2',
-        'CEPRE_2024_1' => 'cepre_2024_1',
-        'CEPRE_2024_2' => 'cepre_2024_2',
-        'CEPRE_2025_1' => 'marzo_julio_2025',
-        // 'CEPRE_2025_2' => 'cepre_2025_2',
-
-        // 'NUEVO CICLO'      => 'nombre_de_su_base_de_datos'
-    ];
+    // Obtenemos el listado global de ciclos
+    $bases_de_datos = obtenerBasesDeDatos();
 
     // Verificar si el ciclo solicitado tiene una base de datos asignada
     if (!isset($bases_de_datos[$ciclo])) {
