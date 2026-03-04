@@ -9,6 +9,12 @@ header("Access-Control-Allow-Origin: *");
 
 $action = isset($_GET['action']) ? $_GET['action'] : '';
 
+if ($action == 'obtener_ciclos') {
+    header('Content-Type: application/json');
+    echo json_encode(obtenerCiclosDisponibles());
+    exit;
+}
+
 if ($action == 'generar_pdf') {
     $dni = isset($_GET['dni']) ? trim($_GET['dni']) : '';
     $ciclo = isset($_GET['ciclo']) ? trim($_GET['ciclo']) : '';

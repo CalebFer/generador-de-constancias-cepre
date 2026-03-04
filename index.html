@@ -378,14 +378,7 @@
             <div class="input-container">
               <i class="fas fa-calendar-alt input-icon"></i>
               <select id="cicloSelect" required>
-                <option value="">-- Seleccione un ciclo --</option>
-                <option value="CEPRE_2022_1">CEPRE 2022-1</option>
-                <option value="CEPRE_2022_2">CEPRE 2022-2</option>
-                <option value="CEPRE_2023_1">CEPRE 2023-1</option>
-                <option value="CEPRE_2023_2">CEPRE 2023-2</option>
-                <option value="CEPRE_2024_1">CEPRE 2024-1</option>
-                <option value="CEPRE_2024_2">CEPRE 2024-2</option>
-                <option value="CEPRE_2025_1">CEPRE 2025-1</option>
+                <option value="">-- Cargando ciclos disponibles... --</option>
               </select>
               <i class="fas fa-chevron-down select-arrow"></i>
             </div>
@@ -428,7 +421,38 @@
         const messageText = document.getElementById("messageText");
         const statusIcon = messageBox.querySelector(".status-icon");
 
-        // 0. Lógica de Login
+        // 0. Cargar Ciclos Dinámicamente
+        async function cargarCiclos() {
+          try {
+            const res = await fetch("api.php?action=obtener_ciclos");
+            const ciclos = await res.json();
+            cicloSelect.innerHTML =
+              '<option value="">-- Seleccione un ciclo --</option>';
+            ciclos.forEach((c) => {
+              const option = document.createElement("option");
+              option.value = c;
+
+              // Formateando: ej "CEPRE_2024_1" -> "CEPRE 2024-1"
+              let label = c;
+              if (c.startsWith("CEPRE_")) {
+                const parts = c.split("_");
+                if (parts.length >= 3) {
+                  label = parts[0] + " " + parts[1] + "-" + parts[2];
+                }
+              }
+
+              option.textContent = label;
+              cicloSelect.appendChild(option);
+            });
+          } catch (e) {
+            console.error("Error al cargar ciclos", e);
+            cicloSelect.innerHTML =
+              '<option value="">-- Error al cargar ciclos --</option>';
+          }
+        }
+        cargarCiclos();
+
+        // 1. Lógica de Login
         const loginForm = document.getElementById("loginForm");
         const loginSection = document.getElementById("loginSection");
         const generatorSection = document.getElementById("generatorSection");
