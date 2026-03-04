@@ -1,0 +1,5 @@
+vendor/
+*.xlsx
+constancias_generadas.pdf
+.DS_Store
+*.log
