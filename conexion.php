@@ -10,9 +10,9 @@
  */
 function obtenerConexion($ciclo) {
     // Configuración general del servidor de base de datos
-    $host = 'localhost';
+    $host = '127.0.0.1';
     $usuario = 'root'; // Cambiar por tu usuario real
-    $password = '';    // Cambiar por tu contraseña real
+    $password = 'cepre2026';    // Cambiar por tu contraseña real
     
     // Mapeo de ciclos a sus respectivas bases de datos
     // Aquí puedes agregar o modificar los nombres de las bases de datos
