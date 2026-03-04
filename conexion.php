@@ -11,16 +11,20 @@
 function obtenerConexion($ciclo) {
     // Configuración general del servidor de base de datos
     $host = '127.0.0.1';
-    $usuario = 'root'; // Cambiar por tu usuario real
+    $usuario = 'admincepre'; // Cambiar por tu usuario real
     $password = 'cepre2026';    // Cambiar por tu contraseña real
     
     // Mapeo de ciclos a sus respectivas bases de datos
     // Aquí puedes agregar o modificar los nombres de las bases de datos
     $bases_de_datos = [
-        'ABRIL - AGOSTO 2022' => 'bd_cepreuna_2022_2',
-        'ENERO - MARZO 2023'  => 'bd_cepreuna_2023_1',
-        'ABRIL - AGOSTO 2023' => 'bd_cepreuna_2023_2',
-        'ABRIL - JULIO 2024' => 'cepre_abr_jul2024',
+        'CEPRE_2022_1' => 'cepre',
+        'CEPRE_2022_2'  => 'cepre_2022_2023',
+        'CEPRE_2023_1' => 'cepre_2023_1',
+        'CEPRE_2023_2' => 'cepre_2023_2',
+        'CEPRE_2024_1' => 'cepre_2024_1',
+        'CEPRE_2024_2' => 'cepre_2024_2',
+        'CEPRE_2025_1' => 'marzo_julio_2025',
+        // 'CEPRE_2025_2' => 'cepre_2025_2',
 
         // 'NUEVO CICLO'      => 'nombre_de_su_base_de_datos'
     ];
