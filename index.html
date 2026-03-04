@@ -148,6 +148,8 @@
       }
 
       input[type="text"],
+      input[type="email"],
+      input[type="password"],
       select {
         width: 100%;
         padding: 0.875rem 1rem 0.875rem 2.75rem;
@@ -162,6 +164,8 @@
       }
 
       input[type="text"]:focus,
+      input[type="email"]:focus,
+      input[type="password"]:focus,
       select:focus {
         border-color: var(--secondary-color);
         background-color: white;
@@ -297,7 +301,54 @@
     </header>
 
     <div class="container">
-      <div class="card">
+      <!-- Sección de Login -->
+      <div id="loginSection" class="card" style="transition: opacity 0.3s ease">
+        <h2 class="card-title">Iniciar Sesión</h2>
+        <p class="card-subtitle">
+          Ingrese sus credenciales para acceder al sistema.
+        </p>
+
+        <form id="loginForm" class="form">
+          <div class="form-group">
+            <label for="emailInput">Correo Electrónico</label>
+            <div class="input-container">
+              <i class="fas fa-envelope input-icon"></i>
+              <input
+                type="email"
+                id="emailInput"
+                placeholder="ejemplo@cepreuna.edu.pe"
+                required
+              />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="passwordInput">Contraseña</label>
+            <div class="input-container">
+              <i class="fas fa-lock input-icon"></i>
+              <input
+                type="password"
+                id="passwordInput"
+                placeholder="••••••••"
+                required
+              />
+            </div>
+          </div>
+
+          <button type="submit" class="btn-primary">
+            <i class="fas fa-sign-in-alt"></i>
+            <span class="btn-text">Ingresar</span>
+          </button>
+        </form>
+
+        <div id="loginErrorMsg" class="message error" style="margin-top: 1rem">
+          <i class="fas fa-exclamation-circle status-icon"></i>
+          <span></span>
+        </div>
+      </div>
+
+      <!-- Sección Principal (Oculta por defecto) -->
+      <div id="generatorSection" class="card" style="display: none">
         <h2 class="card-title">Consultar y Generar PDF</h2>
         <p class="card-subtitle">
           Ingrese los datos para verificar y descargar la constancia
@@ -331,6 +382,7 @@
                 <option value="ABRIL - AGOSTO 2022">ABRIL - AGOSTO 2022</option>
                 <option value="ENERO - MARZO 2023">ENERO - MARZO 2023</option>
                 <option value="ABRIL - AGOSTO 2023">ABRIL - AGOSTO 2023</option>
+                <option value="ABRIL - JULIO 2024">ABRIL - JULIO 2024</option>
                 <!-- Los ciclos pueden venir de API en el futuro -->
               </select>
               <i class="fas fa-chevron-down select-arrow"></i>
@@ -373,6 +425,43 @@
         const messageBox = document.getElementById("messageBox");
         const messageText = document.getElementById("messageText");
         const statusIcon = messageBox.querySelector(".status-icon");
+
+        // 0. Lógica de Login
+        const loginForm = document.getElementById("loginForm");
+        const loginSection = document.getElementById("loginSection");
+        const generatorSection = document.getElementById("generatorSection");
+        const loginErrorMsg = document.getElementById("loginErrorMsg");
+
+        // Credenciales de acceso de ejemplo
+        const USER_VALIDO = "secretaria@cepreuna.edu.pe";
+        const PASS_VALIDA = "secre123";
+
+        loginForm.addEventListener("submit", (e) => {
+          e.preventDefault();
+          const email = document.getElementById("emailInput").value.trim();
+          const password = document.getElementById("passwordInput").value;
+
+          loginErrorMsg.style.display = "none";
+
+          if (email === USER_VALIDO && password === PASS_VALIDA) {
+            // Animación sencilla de transición
+            loginSection.style.opacity = "0";
+            setTimeout(() => {
+              loginSection.style.display = "none";
+              generatorSection.style.display = "block";
+              // Fade in
+              generatorSection.style.opacity = "0";
+              setTimeout(() => {
+                generatorSection.style.transition = "opacity 0.3s ease";
+                generatorSection.style.opacity = "1";
+              }, 50);
+            }, 300);
+          } else {
+            loginErrorMsg.style.display = "flex";
+            loginErrorMsg.querySelector("span").textContent =
+              "Correo o contraseña incorrectos.";
+          }
+        });
 
         // 1. Calcular y llenar la Fecha de Expedición (Zona Horaria Local / Lima)
         const options = {

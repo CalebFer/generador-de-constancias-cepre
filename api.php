@@ -1,42 +1,11 @@
 <?php
 // api.php
 require_once __DIR__ . '/vendor/autoload.php';
+require_once __DIR__ . '/conexion.php';
 use setasign\Fpdi\Tcpdf\Fpdi;
 
 // Permitir solicitudes (CORS si fuera necesario)
 header("Access-Control-Allow-Origin: *");
-
-function obtenerDatosDocentesAPI() {
-    return [
-        [
-            'nombre' => 'VILCA CALIZAYA KEYKO FANNY',
-            'dni' => '70662491',
-            'ciclo' => 'ABRIL - AGOSTO 2022',
-            'sedes' => 'Juliaca | Puno',
-            'cursos' => 'Razonamiento Verbal',
-            'areas' => 'Biomédicas | Ingenierías',
-            'horas' => 96
-        ],
-        [
-            'nombre' => 'JUAN PEREZ QUISPE',
-            'dni' => '12345678',
-            'ciclo' => 'ENERO - MARZO 2023',
-            'sedes' => 'Puno',
-            'cursos' => 'Matemática Básica',
-            'areas' => 'Ingenierías',
-            'horas' => 120
-        ],
-        [
-            'nombre' => 'JUAN PEREZ QUISPE',
-            'dni' => '12345678',
-            'ciclo' => 'ABRIL - AGOSTO 2023',
-            'sedes' => 'Juliaca',
-            'cursos' => 'Física I',
-            'areas' => 'Ingenierías',
-            'horas' => 90
-        ]
-    ];
-}
 
 $action = isset($_GET['action']) ? $_GET['action'] : '';
 
@@ -51,14 +20,13 @@ if ($action == 'generar_pdf') {
         exit;
     }
 
-    $todos = obtenerDatosDocentesAPI();
-    $docente_imprimir = null;
-    
-    foreach ($todos as $doc) {
-        if ($doc['dni'] === $dni && $doc['ciclo'] === $ciclo) {
-            $docente_imprimir = $doc;
-            break;
-        }
+    try {
+        $pdo = obtenerConexion($ciclo);
+        $docente_imprimir = obtenerDatosDocente($pdo, $dni, $ciclo);
+    } catch (Exception $e) {
+        header('Content-Type: application/json');
+        echo json_encode(['status' => 'error', 'message' => $e->getMessage()]);
+        exit;
     }
 
     if (!$docente_imprimir) {
@@ -92,12 +60,12 @@ if ($action == 'generar_pdf') {
     $tplId = $pdf->importPage(1);
     $pdf->useTemplate($tplId, 0, 0, 210, 297, true);
 
-    $pdf->SetY(65);
-    $pdf->SetFont('helvetica', 'BU', 24);
+    $pdf->SetY(40);
+    $pdf->SetFont('helvetica', 'BU', 36);
     $pdf->Cell(0, 10, 'CONSTANCIA', 0, 1, 'C');
     $pdf->Ln(10);
 
-    $pdf->SetFont('helvetica', 'B', 12);
+    $pdf->SetFont('helvetica', 'B', 13);
     $parrafo_suscribe = "LA QUE SUSCRIBE, PRESIDENTE DEL CENTRO PREUNIVERSITARIO\nDE LA UNIVERSIDAD NACIONAL DEL ALTIPLANO - PUNO.";
     $pdf->MultiCell(0, 6, $parrafo_suscribe, 0, 'C');
     $pdf->Ln(8);
@@ -105,7 +73,7 @@ if ($action == 'generar_pdf') {
     $pdf->SetFont('helvetica', '', 12);
     $html_datos = <<<EOD
 <div style="text-align: justify; line-height: 1.5; text-indent: 40px;">
-Que el(la) Sr(a).: <b>{$docente_imprimir['nombre']}</b>, identificado(a) con DNI N° <b>{$docente_imprimir['dni']}</b>, ha laborado como <b>DOCENTE</b> en el Centro Preuniversitario de la Universidad Nacional del Altiplano durante el ciclo académico <b>{$docente_imprimir['ciclo']}.</b>, según el siguiente detalle:
+Que el(la) Sr(a).: <b>{$docente_imprimir['nombre']}</b>, identificado(a) con DNI N° <b>{$docente_imprimir['dni']}</b>, ha laborado como <b>DOCENTE</b> en el Centro Preuniversitario de la Universidad Nacional del Altiplano durante el ciclo académico <b>{$docente_imprimir['ciclo']}</b>, según el siguiente detalle:
 </div>
 EOD;
     $pdf->writeHTMLCell(0, 0, '', '', $html_datos, 0, 1, 0, true, 'J');
