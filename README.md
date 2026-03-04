@@ -6,10 +6,6 @@ Sistema web dinámico para la consulta y generación de constancias de trabajo p
 
 - **Consulta por DNI**: Interfaz moderna para buscar registros específicos.
 - **Generación de PDF al vuelo**: Utiliza TCPDF y FPDI para incrustar datos sobre un fondo de PDF oficial.
-- **Formulario Inteligente**:
-  - Selección de ciclo académico.
-  - Fecha de expedición automática basada en la zona horaria de Lima (Perú).
-- **Diseño Premium**: Interfaz minimalista, responsiva y con micro-animaciones (Inter Font + FontAwesome).
 
 ## 🛠️ Tecnologías
 
