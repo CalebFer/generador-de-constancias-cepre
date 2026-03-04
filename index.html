@@ -1,0 +1,490 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Generador de Constancias CEPREUNA</title>
+    <!-- Google Fonts -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <!-- Font Awesome -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <!-- Custom CSS -->
+    <style>
+      /* css/style.css */
+      :root {
+        --primary-color: #0f172a;
+        --secondary-color: #3b82f6;
+        --accent-color: #2563eb;
+        --bg-color: #f1f5f9;
+        --card-bg: #ffffff;
+        --text-main: #334155;
+        --text-muted: #64748b;
+        --error-color: #ef4444;
+        --error-bg: #fef2f2;
+        --error-border: #fecaca;
+        --success-color: #10b981;
+        --success-bg: #ecfdf5;
+        --success-border: #a7f3d0;
+        --border-color: #e2e8f0;
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: "Inter", sans-serif;
+      }
+
+      body {
+        background-color: var(--bg-color);
+        color: var(--text-main);
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+
+      .header {
+        width: 100%;
+        background-color: var(--primary-color);
+        color: white;
+        padding: 2rem 0;
+        text-align: center;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        margin-bottom: 3rem;
+        background-image: linear-gradient(to right, #0f172a, #1e293b);
+      }
+
+      .header h1 {
+        font-size: 2rem;
+        font-weight: 700;
+        letter-spacing: -0.025em;
+        margin-bottom: 0.5rem;
+      }
+
+      .header p {
+        color: #cbd5e1;
+        font-size: 1rem;
+        font-weight: 300;
+      }
+
+      .container {
+        width: 100%;
+        max-width: 500px;
+        padding: 0 1rem;
+        flex: 1;
+      }
+
+      .card {
+        background: var(--card-bg);
+        border-radius: 16px;
+        padding: 2.5rem;
+        box-shadow:
+          0 20px 25px -5px rgba(0, 0, 0, 0.05),
+          0 8px 10px -6px rgba(0, 0, 0, 0.05);
+        border: 1px solid var(--border-color);
+        width: 100%;
+      }
+
+      .card-title {
+        font-size: 1.5rem;
+        color: var(--primary-color);
+        margin-bottom: 0.25rem;
+        font-weight: 600;
+        text-align: center;
+      }
+
+      .card-subtitle {
+        color: var(--text-muted);
+        font-size: 0.95rem;
+        text-align: center;
+        margin-bottom: 2rem;
+        line-height: 1.5;
+      }
+
+      .form {
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+      }
+
+      .form-group {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+      }
+
+      .form-group label {
+        font-weight: 500;
+        color: var(--text-main);
+        font-size: 0.95rem;
+      }
+
+      .input-container {
+        position: relative;
+        display: flex;
+        align-items: center;
+      }
+
+      .input-icon {
+        position: absolute;
+        left: 1rem;
+        color: #94a3b8;
+        pointer-events: none;
+        transition: color 0.2s;
+      }
+
+      .select-arrow {
+        position: absolute;
+        right: 1rem;
+        color: #94a3b8;
+        pointer-events: none;
+      }
+
+      input[type="text"],
+      select {
+        width: 100%;
+        padding: 0.875rem 1rem 0.875rem 2.75rem;
+        border: 2px solid var(--border-color);
+        border-radius: 10px;
+        font-size: 1rem;
+        outline: none;
+        transition: all 0.2s ease;
+        background-color: #f8fafc;
+        color: var(--text-main);
+        appearance: none;
+      }
+
+      input[type="text"]:focus,
+      select:focus {
+        border-color: var(--secondary-color);
+        background-color: white;
+        box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+      }
+
+      .input-container:focus-within .input-icon {
+        color: var(--secondary-color);
+      }
+
+      .input-container.readonly input {
+        background-color: #e2e8f0;
+        color: var(--text-muted);
+        cursor: not-allowed;
+        border-color: transparent;
+      }
+
+      .input-container.readonly .input-icon {
+        color: var(--text-muted);
+      }
+
+      .btn-primary {
+        background-color: var(--secondary-color);
+        color: white;
+        border: none;
+        padding: 1rem;
+        border-radius: 10px;
+        font-weight: 600;
+        font-size: 1.05rem;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 0.75rem;
+        margin-top: 1rem;
+        box-shadow: 0 4px 6px -1px rgba(59, 130, 246, 0.4);
+      }
+
+      .btn-primary:hover {
+        background-color: var(--accent-color);
+        transform: translateY(-2px);
+        box-shadow: 0 10px 15px -3px rgba(59, 130, 246, 0.4);
+      }
+
+      .btn-primary:active {
+        transform: translateY(0);
+      }
+
+      .message {
+        margin-top: 1.5rem;
+        padding: 1rem 1.25rem;
+        border-radius: 10px;
+        display: none;
+        align-items: flex-start;
+        gap: 0.75rem;
+        font-size: 0.95rem;
+        line-height: 1.5;
+        animation: fadeInDown 0.3s ease;
+      }
+
+      .message.error {
+        background-color: var(--error-bg);
+        color: var(--error-color);
+        border: 1px solid var(--error-border);
+      }
+
+      .message.success {
+        background-color: var(--success-bg);
+        color: var(--success-color);
+        border: 1px solid var(--success-border);
+      }
+
+      .message i {
+        margin-top: 0.15rem;
+        font-size: 1.1rem;
+      }
+
+      @keyframes fadeInDown {
+        from {
+          opacity: 0;
+          transform: translateY(-10px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      /* Loading Spinner */
+      .spinner {
+        display: none;
+        width: 22px;
+        height: 22px;
+        border: 3px solid rgba(255, 255, 255, 0.3);
+        border-radius: 50%;
+        border-top-color: white;
+        animation: spin 1s linear infinite;
+      }
+
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+
+      button.loading .spinner {
+        display: inline-block;
+      }
+
+      button.loading .btn-text,
+      button.loading .fa-file-pdf {
+        display: none;
+      }
+
+      button:disabled {
+        opacity: 0.8;
+        cursor: not-allowed;
+        transform: none !important;
+      }
+
+      @media (max-width: 480px) {
+        .card {
+          padding: 1.5rem;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header class="header">
+      <h1>Constancias de Docentes</h1>
+      <p>Centro Preuniversitario - UNA Puno</p>
+    </header>
+
+    <div class="container">
+      <div class="card">
+        <h2 class="card-title">Consultar y Generar PDF</h2>
+        <p class="card-subtitle">
+          Ingrese los datos para verificar y descargar la constancia
+          correspondiente.
+        </p>
+
+        <form id="constanciaForm" class="form">
+          <div class="form-group">
+            <label for="dniInput">Número de DNI</label>
+            <div class="input-container">
+              <i class="fas fa-id-card input-icon"></i>
+              <input
+                type="text"
+                id="dniInput"
+                placeholder="Ej. 70662491"
+                maxlength="8"
+                pattern="\d{8}"
+                required
+                title="Ingrese 8 dígitos numéricos"
+                oninput="this.value = this.value.replace(/[^0-9]/g, '')"
+              />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="cicloSelect">Ciclo Académico</label>
+            <div class="input-container">
+              <i class="fas fa-calendar-alt input-icon"></i>
+              <select id="cicloSelect" required>
+                <option value="">-- Seleccione un ciclo --</option>
+                <option value="ABRIL - AGOSTO 2022">ABRIL - AGOSTO 2022</option>
+                <option value="ENERO - MARZO 2023">ENERO - MARZO 2023</option>
+                <option value="ABRIL - AGOSTO 2023">ABRIL - AGOSTO 2023</option>
+                <!-- Los ciclos pueden venir de API en el futuro -->
+              </select>
+              <i class="fas fa-chevron-down select-arrow"></i>
+            </div>
+          </div>
+
+          <div class="form-group" style="display: none">
+            <label for="fechaInput"
+              >Fecha de Expedición (Automática Lima)</label
+            >
+            <div class="input-container readonly">
+              <i class="fas fa-clock input-icon"></i>
+              <input type="text" id="fechaInput" readonly />
+            </div>
+          </div>
+
+          <button type="submit" id="generateBtn" class="btn-primary">
+            <i class="fas fa-file-pdf"></i>
+            <span class="btn-text">Generar Constancia</span>
+            <div class="spinner"></div>
+          </button>
+        </form>
+
+        <div id="messageBox" class="message">
+          <i class="status-icon fas"></i>
+          <span id="messageText"></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Script principal -->
+    <script>
+      // js/app.js
+      document.addEventListener("DOMContentLoaded", () => {
+        const fechaInput = document.getElementById("fechaInput");
+        const form = document.getElementById("constanciaForm");
+        const dniInput = document.getElementById("dniInput");
+        const cicloSelect = document.getElementById("cicloSelect");
+        const btn = document.getElementById("generateBtn");
+        const messageBox = document.getElementById("messageBox");
+        const messageText = document.getElementById("messageText");
+        const statusIcon = messageBox.querySelector(".status-icon");
+
+        // 1. Calcular y llenar la Fecha de Expedición (Zona Horaria Local / Lima)
+        const options = {
+          timeZone: "America/Lima",
+          day: "2-digit",
+          month: "long",
+          year: "numeric",
+        };
+
+        const formatter = new Intl.DateTimeFormat("es-PE", options);
+        // El formatter de JS puede dar '03 de marzo de 2026' o similar
+        // Vamos a asegurar el formato "03 de noviembre de 2025"
+        let partes = formatter.formatToParts(new Date());
+        let dia = partes.find((p) => p.type === "day").value;
+        let mes = partes.find((p) => p.type === "month").value;
+        let anio = partes.find((p) => p.type === "year").value;
+
+        const fechaActual = `${dia} de ${mes} de ${anio}`;
+        fechaInput.value = fechaActual;
+
+        // 2. Manejo del Submit del Formulario
+        form.addEventListener("submit", async (e) => {
+          e.preventDefault();
+
+          const dni = dniInput.value.trim();
+          const ciclo = cicloSelect.value;
+          const fecha = fechaInput.value;
+
+          if (dni.length !== 8) {
+            showMessage("El DNI debe tener 8 dígitos numéricos.", "error");
+            return;
+          }
+
+          // Estado de carga
+          btn.classList.add("loading");
+          btn.disabled = true;
+          hideMessage();
+
+          // 3. Obtener el PDF desde la API o manejar el error
+          try {
+            const encodedDoc = encodeURIComponent(dni);
+            const encodedCycle = encodeURIComponent(ciclo);
+            const encodedDate = encodeURIComponent(fecha);
+
+            const url = `api.php?action=generar_pdf&dni=${encodedDoc}&ciclo=${encodedCycle}&fecha=${encodedDate}`;
+
+            // Hacemos un fetch para verificar si da PDF o JSON (error)
+            const response = await fetch(url);
+            const contentType = response.headers.get("content-type");
+
+            if (contentType && contentType.includes("application/json")) {
+              // Es un error del backend (DNI no existe, falta archivo, etc)
+              const data = await response.json();
+              showMessage(data.message || "Error desconocido", "error");
+            } else if (response.ok) {
+              // Es un PDF válido (application/pdf), disparamos la descarga
+              const blob = await response.blob();
+              const downloadUrl = window.URL.createObjectURL(blob);
+
+              // Opción 1: Forzar descarga
+              /*
+                const a = document.createElement('a');
+                a.style.display = 'none';
+                a.href = downloadUrl;
+                a.download = `Constancia_CEPREUNA_${dni}.pdf`;
+                document.body.appendChild(a);
+                a.click();
+                window.URL.revokeObjectURL(downloadUrl);
+                */
+
+              // Opción 2: Abrir en nueva pestaña
+              window.open(downloadUrl, "_blank");
+
+              showMessage("Constancia generada con éxito.", "success");
+            } else {
+              showMessage(
+                "Error al procesar la solicitud con el servidor.",
+                "error",
+              );
+            }
+          } catch (error) {
+            console.error("Error:", error);
+            showMessage(
+              "Ocurrió un error de red. Intenta nuevamente.",
+              "error",
+            );
+          } finally {
+            btn.classList.remove("loading");
+            btn.disabled = false;
+          }
+        });
+
+        // 4. Utilidades
+        function showMessage(msg, type) {
+          messageBox.className = `message ${type}`;
+          messageText.textContent = msg;
+
+          statusIcon.className = "status-icon fas";
+          if (type === "error") {
+            statusIcon.classList.add("fa-exclamation-circle");
+          } else if (type === "success") {
+            statusIcon.classList.add("fa-check-circle");
+          }
+
+          messageBox.style.display = "flex";
+        }
+
+        function hideMessage() {
+          messageBox.style.display = "none";
+          messageText.textContent = "";
+        }
+      });
+    </script>
+  </body>
+</html>
