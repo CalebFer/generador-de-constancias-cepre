@@ -1,91 +1,122 @@
-<?php
+﻿<?php
 // conexion.php
 
 /**
- * Devuelve el arreglo con todas las bases de datos configuradas para cada ciclo.
- * 
- * @return array Arreglo asociativo de Ciclo => NombreBD
+ * Devuelve la configuracion de conexion por cada ciclo.
+ *
+ * @return array<string, array<string, mixed>>
  */
-function obtenerBasesDeDatos() {
+function obtenerConfiguracionesDeConexion() {
+    $hostLocal = getenv('CEPRE_DB_HOST_LOCAL') ?: '127.0.0.1';
+    $usuarioLocal = getenv('CEPRE_DB_USER_LOCAL') ?: 'admincepre';
+    $passwordLocal = getenv('CEPRE_DB_PASS_LOCAL') ?: 'cepre2026';
+
+    $hostRemoto = getenv('CEPRE_DB_HOST_REMOTO') ?: '138.68.226.228';
+    $puertoRemoto = (int) (getenv('CEPRE_DB_PORT_REMOTO') ?: 3306);
+    $usuarioRemoto = getenv('CEPRE_DB_USER_REMOTO') ?: 'vista';
+    $passwordRemoto = getenv('CEPRE_DB_PASS_REMOTO') ?: '3DC35dd_oXb\\~FvuT';
+    $baseRemota = getenv('CEPRE_DB_NAME_REMOTO') ?: 'cepreuna_production';
+
+    $crearConfigLocal = function ($baseDeDatos) use ($hostLocal, $usuarioLocal, $passwordLocal) {
+        return [
+            'host' => $hostLocal,
+            'usuario' => $usuarioLocal,
+            'password' => $passwordLocal,
+            'dbname' => $baseDeDatos,
+        ];
+    };
+
     return [
-        'CEPRE_2022_1' => 'cepre',
-        'CEPRE_2022_2'  => 'cepre_2022_2023',
-        'CEPRE_2023_1' => 'cepre_2023_1',
-        'CEPRE_2023_2' => 'cepre_2023_2',
-        'CEPRE_2024_1' => 'cepre_2024_1',
-        'CEPRE_2024_2' => 'cepre_2024_2',
-        'CEPRE_2025_1' => 'marzo_julio_2025',
+        'CEPRE_2022_1' => $crearConfigLocal('cepre'),
+        'CEPRE_2022_2' => $crearConfigLocal('cepre_2022_2023'),
+        'CEPRE_2023_1' => $crearConfigLocal('cepre_2023_1'),
+        'CEPRE_2023_2' => $crearConfigLocal('cepre_2023_2'),
+        'CEPRE_2024_1' => $crearConfigLocal('cepre_2024_1'),
+        'CEPRE_2024_2' => $crearConfigLocal('cepre_2024_2'),
+        'CEPRE_2025_1' => $crearConfigLocal('marzo_julio_2025'),
+        'CEPRE_2026_1' => [
+            'host' => $hostRemoto,
+            'port' => $puertoRemoto,
+            'usuario' => $usuarioRemoto,
+            'password' => $passwordRemoto,
+            'dbname' => $baseRemota,
+        ],
     ];
 }
 
 /**
- * Devuelve los nombres de los ciclos (claves) que están configurados.
+ * Devuelve el arreglo con todas las bases de datos configuradas para cada ciclo.
+ *
+ * @return array Arreglo asociativo de Ciclo => NombreBD
+ */
+function obtenerBasesDeDatos() {
+    $basesDeDatos = [];
+
+    foreach (obtenerConfiguracionesDeConexion() as $ciclo => $configuracion) {
+        $basesDeDatos[$ciclo] = $configuracion['dbname'];
+    }
+
+    return $basesDeDatos;
+}
+
+/**
+ * Devuelve los nombres de los ciclos (claves) que estan configurados.
  *
  * @return array
  */
 function obtenerCiclosDisponibles() {
-    return array_keys(obtenerBasesDeDatos());
+    return array_keys(obtenerConfiguracionesDeConexion());
 }
 
 /**
- * Función para obtener la conexión a la base de datos dependiendo del ciclo
- * 
- * @param string $ciclo El nombre del ciclo académico
- * @return PDO La instancia de conexión PDO
- * @throws Exception Si no hay configuración para el ciclo o falla la conexión
+ * Funcion para obtener la conexion a la base de datos dependiendo del ciclo.
+ *
+ * @param string $ciclo El nombre del ciclo academico.
+ * @return PDO La instancia de conexion PDO.
+ * @throws Exception Si no hay configuracion para el ciclo o falla la conexion.
  */
 function obtenerConexion($ciclo) {
-    // Configuración general del servidor de base de datos
-    $host = '127.0.0.1';
-    $usuario = 'admincepre'; // Cambiar por tu usuario real
-    $password = 'cepre2026';    // Cambiar por tu contraseña real
-    
-    // Obtenemos el listado global de ciclos
-    $bases_de_datos = obtenerBasesDeDatos();
+    $configuraciones = obtenerConfiguracionesDeConexion();
 
-    // Verificar si el ciclo solicitado tiene una base de datos asignada
-    if (!isset($bases_de_datos[$ciclo])) {
-        throw new Exception("No existe una base de datos configurada para el ciclo: " . $ciclo);
+    if (!isset($configuraciones[$ciclo])) {
+        throw new Exception('No existe una base de datos configurada para el ciclo: ' . $ciclo);
     }
 
-    $db_nombre = $bases_de_datos[$ciclo];
+    $configuracion = $configuraciones[$ciclo];
+    $host = $configuracion['host'];
+    $usuario = $configuracion['usuario'];
+    $password = $configuracion['password'];
+    $db_nombre = $configuracion['dbname'];
+    $puerto = isset($configuracion['port']) ? ';port=' . $configuracion['port'] : '';
 
     try {
-        // Cadena de conexión (DSN)
-        $dsn = "mysql:host=$host;dbname=$db_nombre;charset=utf8mb4";
-        
-        // Opciones de PDO para mejor manejo de errores y caracteres
-        $opciones = [
-            PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION, // Lanza excepciones en caso de error
-            PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,       // Devuelve arrays asociativos por defecto
-            PDO::ATTR_EMULATE_PREPARES   => false,                  // Desactiva la emulación para mayor seguridad
-        ];
-        
-        // Crear y retornar la conexión
-        $pdo = new PDO($dsn, $usuario, $password, $opciones);
-        return $pdo;
+        $dsn = "mysql:host=$host$puerto;dbname=$db_nombre;charset=utf8mb4";
 
+        $opciones = [
+            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+            PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+            PDO::ATTR_EMULATE_PREPARES => false,
+        ];
+
+        return new PDO($dsn, $usuario, $password, $opciones);
     } catch (PDOException $e) {
-        // Capturar error de conexión y lanzar una excepción manejable
-        throw new Exception("Error de conexión a la base de datos '$db_nombre': " . $e->getMessage());
+        throw new Exception("Error de conexion a la base de datos '$db_nombre': " . $e->getMessage());
     }
 }
 
 function existeColumna(PDO $pdo, $tabla, $columna) {
-    // Sanitizar un poco si es necesario, aunque son valores controlados
     $sql = "SHOW COLUMNS FROM `$tabla` LIKE '$columna'";
     $stmt = $pdo->query($sql);
     return $stmt->rowCount() > 0;
 }
 
 function obtenerCaseSuplente(PDO $pdo) {
-
     $tieneTipo = existeColumna($pdo, 'carga_academicas', 'tipo');
     $tieneObservacion = existeColumna($pdo, 'asistencia_docentes', 'observacion');
 
     if ($tieneTipo) {
         return "
-            CASE 
+            CASE
                 WHEN ca.tipo = '2' THEN 'Suplente'
                 ELSE 'Principal'
             END
@@ -94,7 +125,7 @@ function obtenerCaseSuplente(PDO $pdo) {
 
     if ($tieneObservacion) {
         return "
-            CASE 
+            CASE
                 WHEN a.observacion LIKE '%SUPLENTE%' THEN 'Suplente'
                 ELSE 'Principal'
             END
@@ -105,39 +136,47 @@ function obtenerCaseSuplente(PDO $pdo) {
 }
 
 function obtenerDatosDocente(PDO $pdo, $dni, $ciclo) {
-    // Buscar nombre del ciclo en la tabla periodos
-    $nombre_ciclo_real = $ciclo; // Fallback
+    $nombre_ciclo_real = $ciclo;
+
     try {
-        $stmtPeriodo = $pdo->query("SELECT inicio_ciclo, fin_ciclo FROM periodos LIMIT 1");
+        $consultaPeriodo = existeColumna($pdo, 'periodos', 'anio')
+            ? 'SELECT inicio_ciclo, fin_ciclo, anio FROM periodos ORDER BY id DESC LIMIT 1'
+            : 'SELECT inicio_ciclo, fin_ciclo FROM periodos ORDER BY id DESC LIMIT 1';
+
+        $stmtPeriodo = $pdo->query($consultaPeriodo);
         if ($rowPeriodo = $stmtPeriodo->fetch()) {
             $inicio = trim($rowPeriodo['inicio_ciclo']);
             $fin = trim($rowPeriodo['fin_ciclo']);
+            $anio = isset($rowPeriodo['anio']) ? trim((string) $rowPeriodo['anio']) : '';
+
             if (!empty($inicio) && !empty($fin)) {
-                $nombre_ciclo_real = $inicio . ' - ' . $fin;
+                $nombre_ciclo_real = trim($inicio . ' - ' . $fin . (!empty($anio) ? ' ' . $anio : ''));
             } elseif (!empty($inicio)) {
-                $nombre_ciclo_real = $inicio;
+                $nombre_ciclo_real = trim($inicio . (!empty($anio) ? ' ' . $anio : ''));
+            } elseif (!empty($anio)) {
+                $nombre_ciclo_real = $anio;
             }
         }
     } catch (Exception $e) {
-        // Ignorar si no existe la tabla o campos y usar el fallback
+        // Si la tabla periodos no esta disponible, usamos el ciclo recibido.
     }
 
     $caseSuplente = obtenerCaseSuplente($pdo);
 
     $sql = "
-    SELECT 
+    SELECT
         d.nro_documento AS dni,
-        d.nombres, 
-        d.paterno, 
-        d.materno, 
+        d.nombres,
+        d.paterno,
+        d.materno,
         d.celular,
         SUM(a.cantidad_horas) AS total_horas,
-        
+
         GROUP_CONCAT(DISTINCT s.denominacion SEPARATOR ' | ') AS sedes,
         GROUP_CONCAT(DISTINCT c.denominacion SEPARATOR ' | ') AS cursos,
         GROUP_CONCAT(DISTINCT ar_grupo.denominacion SEPARATOR ' | ') AS areas,
 
-        GROUP_CONCAT(DISTINCT 
+        GROUP_CONCAT(DISTINCT
             CONCAT(
                 ar_grupo.denominacion, ':', c.denominacion, ' (',
                 $caseSuplente,
@@ -171,7 +210,6 @@ function obtenerDatosDocente(PDO $pdo, $dni, $ciclo) {
 
     if (count($resultado) > 0) {
         $row = $resultado[0];
-        // En el ejemplo la PDF espera: VILCA CALIZAYA KEYKO FANNY (Paterno Materno Nombres)
         $nombreCompleto = trim($row['paterno'] . ' ' . $row['materno'] . ' ' . $row['nombres']);
         return [
             'nombre' => strtoupper($nombreCompleto),
@@ -183,7 +221,7 @@ function obtenerDatosDocente(PDO $pdo, $dni, $ciclo) {
             'horas' => $row['total_horas']
         ];
     }
-    
+
     return null;
 }
 ?>
